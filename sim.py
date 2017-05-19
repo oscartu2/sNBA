@@ -3,6 +3,10 @@ from lxml import etree
 import unicodedata
 import csv
 
+# pandas
+import pandas as pd
+from StringIO import StringIO
+
 team_dict = {}
 
 # Selenium
@@ -22,10 +26,9 @@ def make_team(year, team):
 	csv_per_game = driver.find_element_by_xpath("""//*[@id="div_per_game"]""")
 	
 	cpg = unicodedata.normalize('NFKD', csv_per_game.text).encode('ascii','ignore')
-
-	# Lines of player stat per game with first line being category
-	cpg_lines_list = cpg.splitlines()
-	print cpg_lines_list
+        
+        cpg_lines_list = cpg.splitlines()
+	
 	# Print out list of all players ranked by stats
 	# len(cpg_lines_list) returns list of all players
 	for i in range(1,len(cpg_lines_list)):
@@ -45,10 +48,16 @@ def make_team(year, team):
 
 		effective_field_goal_pct = player_stat_list[x+13]
 		free_throw_pct = player_stat_list[x+16]
-		pts = player_stat_list[x+25] # Doesn't work for last person on roster
-		print ("with " + pts + " points, "  + effective_field_goal_pct + " eFG% and " + free_throw_pct + " FT%.")
+		try:
+			pts = player_stat_list[x+25] # Doesn't work for last person on roster
+			print ("with " + pts + " points, " + effective_field_goal_pct + " eFG%, and " + free_throw_pct + " FT%.")
+		except IndexError as e:
+			pts = "No data available"
+			print ("with " + effective_field_goal_pct + " eFG% and " + free_throw_pct + " FT%.")
 
+		
 
+	
 def is_number(str):
 	try: 
 		float(str)
@@ -67,8 +76,8 @@ def main():
 	#team_name1 = raw_input('First Team\'s Name: ')
 	#season2 = raw_input('Second Team\'s year: ')
 	#team_name2 = raw_input('Second Team\'s Name: ')
-	season1 = '2010'
-	team_name1 = 'lakers'
+	season1 = '2015'
+	team_name1 = 'warriors'
 	make_team(season1, team_name1)
 	#make_team(season2, team_name2)
 
